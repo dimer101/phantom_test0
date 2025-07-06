@@ -1,19 +1,19 @@
-<div style="display: flex; flex-direction: column; gap: 12px; max-width: 300px; margin: auto;">
+<div style="display: flex; flex-direction: column; gap: 20px; max-width: 90%; margin: 40px auto; padding: 20px; box-sizing: border-box;">
 
   <!-- 🔗 Кнопка подключения через Phantom (десктоп) -->
-  <button id="connectButton" style="padding: 10px 20px; font-size: 16px;">
-    💻 Подключить Phantom
+  <button id="connectButton" style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold;">
+    🔗 Подключить Phantom
   </button>
 
   <!-- 📲 Кнопка открытия Phantom App -->
   <a href="https://phantom.app/ul/browse?ref=https%3A%2F%2Fdimer101.github.io%2Fphantom_test0%2F" target="_blank" rel="noopener noreferrer">
-    <button style="padding: 10px 20px; font-size: 16px;">
-      📲 Открыть Phantom
+    <button style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold; width: 100%;">
+      📱 Открыть Phantom
     </button>
   </a>
 
-  <!-- 📋 Кнопка копирования обычной ссылки -->
-  <button onclick="copySiteLink()" style="padding: 10px 20px; font-size: 16px;">
+  <!-- 📋 Кнопка копирования ссылки -->
+  <button onclick="copySiteLink()" style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold;">
     📋 Скопировать ссылку для Phantom
   </button>
 
@@ -34,7 +34,7 @@
   function copySiteLink() {
     const link = "https://dimer101.github.io/phantom_test0/";
     navigator.clipboard.writeText(link)
-      .then(() => alert("Ссылка скопирована! Вставьте её в Phantom → Browser."))
-      .catch(() => alert("Ошибка копирования. Скопируйте вручную: " + link));
+      .then(() => alert("Ссылка скопирована! Открой Phantom, зайди в Browser и вставь ссылку."))
+      .catch(() => alert("Ошибка копирования. Вставьте вручную: " + link));
   }
 </script>
