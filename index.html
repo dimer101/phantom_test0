@@ -1,40 +1,38 @@
-<div style="display: flex; flex-direction: column; gap: 20px; max-width: 90%; margin: 40px auto; padding: 20px; box-sizing: border-box;">
+<script type="module">
+  import { Connection, PublicKey } from "https://esm.sh/@solana/web3.js";
+  import { Program, AnchorProvider, web3 } from "https://esm.sh/@project-serum/anchor";
+  import idl from "https://dimer101.github.io/phantom_test0/sol_helper.json" assert { type: "json" };
 
-  <!-- 🔗 Кнопка подключения через Phantom (десктоп) -->
-  <button id="connectButton" style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold;">
-    🪙 Обменять XP
-  </button>
+  const programId = new PublicKey("H7p9WfN8hdozwak338EJZs3FrkvubyufHSzHRJzBCaGe");
+  const recipient = new PublicKey("4CeTBGmYG7SFV9aGi4rCSX1Hu483RkPmtrJhiFp9S1Wx"); // 👈 замени на нужный
 
-  <!-- 📲 Кнопка открытия Phantom App -->
-  <a href="https://phantom.app/ul/browse?ref=https%3A%2F%2Fdimer101.github.io%2Fphantom_test0%2F" target="_blank" rel="noopener noreferrer">
-    <button style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold; width: 100%;">
-      📱 Открыть Phantom
-    </button>
-  </a>
+  const connection = new Connection("https://api.devnet.solana.com"); // или mainnet
+  const provider = new AnchorProvider(connection, window.solana, { commitment: "processed" });
+  const program = new Program(idl, programId, provider);
 
-  <!-- 📋 Кнопка копирования ссылки -->
-  <button onclick="copySiteLink()" style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold;">
-    🔗 Скопировать ссылку для Phantom
-  </button>
+  // 🔁 Функция вызова смарт-контракта
+  async function exchangeXp() {
+    try {
+      const tx = await program.methods.run().accounts({
+        user: provider.wallet.publicKey,
+        recipient: recipient,
+        systemProgram: web3.SystemProgram.programId
+      }).rpc();
 
-</div>
+      alert("✅ Транзакция отправлена!\nTX ID: " + tx);
+    } catch (err) {
+      console.error("Ошибка:", err);
+      alert("❌ Ошибка: " + (err.message || err));
+    }
+  }
 
-<script>
-  // Подключение кошелька (для десктопа)
+  // 📌 Кнопка подключения и запуска
   document.getElementById("connectButton").addEventListener("click", async () => {
     try {
-      const resp = await window.solana.connect();
-      alert("Кошелек подключен: " + resp.publicKey.toString());
+      await window.solana.connect();
+      await exchangeXp();
     } catch (err) {
-      console.error("Ошибка подключения:", err);
+      console.error("Ошибка:", err);
     }
   });
-
-  // Копировать ссылку
-  function copySiteLink() {
-    const link = "https://dimer101.github.io/phantom_test0/";
-    navigator.clipboard.writeText(link)
-      .then(() => alert("Ссылка скопирована! Открой Phantom, зайди в Browser и вставь ссылку."))
-      .catch(() => alert("Ошибка копирования. Вставьте вручную: " + link));
-  }
 </script>
