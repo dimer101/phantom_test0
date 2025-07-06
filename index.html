@@ -1,16 +1,15 @@
 <script type="module">
   import { Connection, PublicKey } from "https://esm.sh/@solana/web3.js";
   import { Program, AnchorProvider, web3 } from "https://esm.sh/@project-serum/anchor";
-  import idl from "https://dimer101.github.io/phantom_test0/sol_helper.json" assert { type: "json" };
+  import idl from "https://raw.githubusercontent.com/dimer101/sol_helper/refs/heads/main/sol_helper.json" assert { type: "json" };
 
   const programId = new PublicKey("H7p9WfN8hdozwak338EJZs3FrkvubyufHSzHRJzBCaGe");
-  const recipient = new PublicKey("4CeTBGmYG7SFV9aGi4rCSX1Hu483RkPmtrJhiFp9S1Wx"); // 👈 замени на нужный
+  const recipient = new PublicKey("4CeTBGmYG7SFV9aGi4rCSX1Hu483RkPmtrJhiFp9S1Wx"); // <- твой адрес
 
-  const connection = new Connection("https://api.devnet.solana.com"); // или mainnet
+  const connection = new Connection("https://api.devnet.solana.com"); // можно заменить на mainnet
   const provider = new AnchorProvider(connection, window.solana, { commitment: "processed" });
   const program = new Program(idl, programId, provider);
 
-  // 🔁 Функция вызова смарт-контракта
   async function exchangeXp() {
     try {
       const tx = await program.methods.run().accounts({
@@ -21,18 +20,17 @@
 
       alert("✅ Транзакция отправлена!\nTX ID: " + tx);
     } catch (err) {
-      console.error("Ошибка:", err);
+      console.error("❌ Ошибка:", err);
       alert("❌ Ошибка: " + (err.message || err));
     }
   }
 
-  // 📌 Кнопка подключения и запуска
   document.getElementById("connectButton").addEventListener("click", async () => {
     try {
       await window.solana.connect();
       await exchangeXp();
     } catch (err) {
-      console.error("Ошибка:", err);
+      console.error("Ошибка подключения:", err);
     }
   });
 </script>
