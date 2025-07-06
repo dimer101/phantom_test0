@@ -1,58 +1,40 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8" />
-  <title>Phantom DApp</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 40px;
+<div style="display: flex; flex-direction: column; gap: 12px; max-width: 300px; margin: auto;">
+
+  <!-- 🔗 Кнопка подключения через Phantom (десктоп) -->
+  <button id="connectButton" style="padding: 10px 20px; font-size: 16px;">
+    💻 Подключить Phantom
+  </button>
+
+  <!-- 📲 Кнопка открытия Phantom App -->
+  <a href="https://phantom.app/ul/browse?ref=https%3A%2F%2Fdimer101.github.io%2Fphantom_test0%2F" target="_blank" rel="noopener noreferrer">
+    <button style="padding: 10px 20px; font-size: 16px;">
+      📲 Открыть Phantom
+    </button>
+  </a>
+
+  <!-- 📋 Кнопка копирования обычной ссылки -->
+  <button onclick="copySiteLink()" style="padding: 10px 20px; font-size: 16px;">
+    📋 Скопировать ссылку для Phantom
+  </button>
+
+</div>
+
+<script>
+  // Подключение кошелька (для десктопа)
+  document.getElementById("connectButton").addEventListener("click", async () => {
+    try {
+      const resp = await window.solana.connect();
+      alert("Кошелек подключен: " + resp.publicKey.toString());
+    } catch (err) {
+      console.error("Ошибка подключения:", err);
     }
-    button {
-      padding: 12px 24px;
-      font-size: 16px;
-      margin: 12px;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
+  });
 
-  <h1>Добро пожаловать в Phantom DApp</h1>
-
-  <!-- Кнопка для ДЕСКТОПА -->
-  <button onclick="connectDesktop()"> 💻 Подключить Phantom </button>
-
-  <!-- Кнопка для МОБИЛЬНОГО Phantom -->
-  <button onclick="openInPhantomApp()"> 📱 Открыть в Phantom </button>
-
-  <script>
-    // Подключение в десктопе
-    async function connectDesktop() {
-      const provider = window.solana;
-
-      if (!provider || !provider.isPhantom) {
-        alert("Phantom не найден. Установите расширение или откройте в Phantom.");
-        return;
-      }
-
-      try {
-        const resp = await provider.connect();
-        alert("Кошелек подключён: " + resp.publicKey.toString());
-      } catch (err) {
-        alert("Ошибка подключения: " + err.message);
-      }
-    }
-
-    // Открытие сайта в Phantom App (мобильный)
-    function openInPhantomApp() {
-      const dappUrl = encodeURIComponent("https://dimer101.github.io/phantom_test0/");
-      const phantomDeepLink = `https://phantom.app/ul/browse?ref=${dappUrl}`;
-      window.open(phantomDeepLink, "_blank");
-    }
-  </script>
-
-</body>
-</html>
+  // Копировать ссылку
+  function copySiteLink() {
+    const link = "https://dimer101.github.io/phantom_test0/";
+    navigator.clipboard.writeText(link)
+      .then(() => alert("Ссылка скопирована! Вставьте её в Phantom → Browser."))
+      .catch(() => alert("Ошибка копирования. Скопируйте вручную: " + link));
+  }
+</script>
