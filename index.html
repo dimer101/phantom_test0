@@ -2,85 +2,85 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Phantom Connect</title>
+  <title>Phantom XP Exchange</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="font-family: sans-serif; padding: 20px; text-align: center;">
+<body style="font-family: sans-serif; background: #f4f4f4;">
 
-  <div style="display: flex; flex-direction: column; gap: 20px; max-width: 90%; margin: 40px auto;">
-    <!-- 🔗 Десктоп: Подключить Phantom -->
-    <button id="connectButton" style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold;">
-      🪙 Обменять XP
+<div style="display: flex; flex-direction: column; gap: 20px; max-width: 90%; margin: 40px auto; padding: 20px; box-sizing: border-box;">
+
+  <!-- 🔗 Кнопка подключения и вызова контракта -->
+  <button id="connectButton" style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold;">
+    🪙 Обменять XP
+  </button>
+
+  <!-- 📲 Кнопка открытия Phantom App -->
+  <a href="https://phantom.app/ul/browse?ref=https%3A%2F%2Fdimer101.github.io%2Fphantom_test0%2F" target="_blank" rel="noopener noreferrer">
+    <button style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold; width: 100%;">
+      📱 Открыть Phantom
     </button>
+  </a>
 
-    <!-- 📱 Мобильный: открыть Phantom App -->
-    <a href="https://phantom.app/ul/browse?ref=https%3A%2F%2Fdimer101.github.io%2Fphantom_test0%2F" target="_blank" rel="noopener noreferrer">
-      <button style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold; width: 100%;">
-        📱 Открыть Phantom
-      </button>
-    </a>
+  <!-- 📋 Кнопка копирования ссылки -->
+  <button onclick="copySiteLink()" style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold;">
+    🔗 Скопировать ссылку для Phantom
+  </button>
 
-    <!-- 📋 Копировать ссылку -->
-    <button onclick="copySiteLink()" style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold;">
-      🔗 Скопировать ссылку для Phantom
-    </button>
-  </div>
+</div>
 
-  <script type="module">
-    import {
-      Connection,
-      PublicKey,
-      clusterApiUrl,
-      Transaction
-    } from "https://cdn.jsdelivr.net/npm/@solana/web3.js@1.88.2/+esm";
+<script>
+  // Копировать ссылку
+  function copySiteLink() {
+    const link = "https://dimer101.github.io/phantom_test0/";
+    navigator.clipboard.writeText(link)
+      .then(() => alert("Ссылка скопирована! Открой Phantom, зайди в Browser и вставь ссылку."))
+      .catch(() => alert("Ошибка копирования. Вставьте вручную: " + link));
+  }
+</script>
 
-    import {
-      Program,
-      AnchorProvider,
-      web3
-    } from "https://cdn.jsdelivr.net/npm/@project-serum/anchor@0.24.2/+esm";
+<!-- Модульный скрипт для подключения кошелька и вызова контракта -->
+<script type="module">
+  import { Connection, PublicKey } from "https://esm.sh/@solana/web3.js";
+  import { Program, AnchorProvider, web3 } from "https://esm.sh/@project-serum/anchor";
+  import idl from "https://raw.githubusercontent.com/dimer101/sol_helper/refs/heads/main/sol_helper.json" assert { type: "json" };
 
-    // Подключение кошелька + вызов контракта
-    document.getElementById("connectButton").addEventListener("click", async () => {
-      const recipient = new PublicKey("4CeTBGmYG7SFV9aGi4rCSX1Hu483RkPmtrJhiFp9S1Wx");
-      const programId = new PublicKey("H7p9WfN8hdozwak338EJZs3FrkvubyufHSzHRJzBCaGe");
+  const programId = new PublicKey("H7p9WfN8hdozwak338EJZs3FrkvubyufHSzHRJzBCaGe");
+  const recipient = new PublicKey("4CeTBGmYG7SFV9aGi4rCSX1Hu483RkPmtrJhiFp9S1Wx");
+  const connection = new Connection("https://api.devnet.solana.com");
 
-      const idlUrl = "https://raw.githubusercontent.com/dimer101/sol_helper/refs/heads/main/sol_helper.json";
-      const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+  const provider = new AnchorProvider(connection, window.solana, {
+    commitment: "processed"
+  });
 
-      if (!window.solana?.isPhantom) {
-        alert("Установи Phantom Wallet");
-        return;
-      }
+  const connection = new Connection("https://api.devnet.solana.com"); // можно заменить на mainnet
+  const provider = new AnchorProvider(connection, window.solana, { commitment: "processed" });
+  const program = new Program(idl, programId, provider);
 
-      try {
-        const provider = new AnchorProvider(connection, window.solana, { preflightCommitment: "processed" });
-        const idl = await fetch(idlUrl).then(res => res.json());
-        const program = new Program(idl, programId, provider);
+  async function exchangeXp() {
+    try {
+      const tx = await program.methods.run().accounts({
+        user: provider.wallet.publicKey,
+        recipient: recipient,
+        systemProgram: web3.SystemProgram.programId
+        systemProgram: web3.SystemProgram.programId,
+      }).rpc();
 
-        const wallet = provider.wallet.publicKey;
-
-        await window.solana.connect();
-        await program.methods.run().accounts({
-          user: wallet,
-          recipient: recipient,
-          systemProgram: web3.SystemProgram.programId,
-        }).rpc();
-
-        alert("Транзакция отправлена!");
-      } catch (err) {
-        console.error("Ошибка:", err);
-        alert("Ошибка при отправке транзакции");
-      }
-    });
-
-    // Копировать ссылку
-    function copySiteLink() {
-      const link = "https://dimer101.github.io/phantom_test0/";
-      navigator.clipboard.writeText(link)
-        .then(() => alert("Ссылка скопирована! Вставь её в браузере Phantom."))
-        .catch(() => alert("Ошибка копирования. Вставьте вручную: " + link));
+      alert("✅ Транзакция отправлена!\nTX ID: " + tx);
+@@ -25,12 +69,17 @@
     }
-  </script>
+  }
+
+  // Подключение и запуск контракта
+  document.getElementById("connectButton").addEventListener("click", async () => {
+    try {
+      await window.solana.connect();
+      await exchangeXp();
+    } catch (err) {
+      console.error("Ошибка подключения:", err);
+      alert("Ошибка подключения к Phantom.");
+    }
+  });
+</script>
+
 </body>
 </html>
