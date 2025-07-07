@@ -2,85 +2,81 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Phantom XP Exchange</title>
+  <title>Phantom XP Обмен</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="font-family: sans-serif; background: #f4f4f4;">
+<body style="font-family: Arial, sans-serif; padding: 20px; background: #f7f7f7;">
 
-<div style="display: flex; flex-direction: column; gap: 20px; max-width: 90%; margin: 40px auto; padding: 20px; box-sizing: border-box;">
+  <div style="display: flex; flex-direction: column; gap: 20px; max-width: 90%; margin: 40px auto; padding: 20px; background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
 
-  <!-- 🔗 Кнопка подключения и вызова контракта -->
-  <button id="connectButton" style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold;">
-    🪙 Обменять XP
-  </button>
-
-  <!-- 📲 Кнопка открытия Phantom App -->
-  <a href="https://phantom.app/ul/browse?ref=https%3A%2F%2Fdimer101.github.io%2Fphantom_test0%2F" target="_blank" rel="noopener noreferrer">
-    <button style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold; width: 100%;">
-      📱 Открыть Phantom
+    <!-- 🪙 Кнопка подключения через Phantom и вызова контракта -->
+    <button id="connectButton" style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold; background-color: #8247e5; color: white; border: none;">
+      🪙 Обменять XP
     </button>
-  </a>
 
-  <!-- 📋 Кнопка копирования ссылки -->
-  <button onclick="copySiteLink()" style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold;">
-    🔗 Скопировать ссылку для Phantom
-  </button>
+    <!-- 📱 Кнопка открытия Phantom App -->
+    <a href="https://phantom.app/ul/browse?ref=https%3A%2F%2Fdimer101.github.io%2Fphantom_test0%2F" target="_blank" rel="noopener noreferrer">
+      <button style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold; width: 100%; background-color: #10b981; color: white; border: none;">
+        📱 Открыть Phantom
+      </button>
+    </a>
 
-</div>
+    <!-- 🔗 Кнопка копирования ссылки -->
+    <button id="copyButton" style="padding: 18px 24px; font-size: 20px; border-radius: 12px; font-weight: bold; background-color: #2563eb; color: white; border: none;">
+      🔗 Скопировать ссылку для Phantom
+    </button>
 
-<script>
-  // Копировать ссылку
-  function copySiteLink() {
-    const link = "https://dimer101.github.io/phantom_test0/";
-    navigator.clipboard.writeText(link)
-      .then(() => alert("Ссылка скопирована! Открой Phantom, зайди в Browser и вставь ссылку."))
-      .catch(() => alert("Ошибка копирования. Вставьте вручную: " + link));
-  }
-</script>
+  </div>
 
-<!-- Модульный скрипт для подключения кошелька и вызова контракта -->
-<script type="module">
-  import { Connection, PublicKey } from "https://esm.sh/@solana/web3.js";
-  import { Program, AnchorProvider, web3 } from "https://esm.sh/@project-serum/anchor";
-  import idl from "https://raw.githubusercontent.com/dimer101/sol_helper/refs/heads/main/sol_helper.json" assert { type: "json" };
+  <!-- Anchor / Solana Script -->
+  <script type="module">
+    import { Connection, PublicKey } from "https://esm.sh/@solana/web3.js";
+    import { Program, AnchorProvider, web3 } from "https://esm.sh/@project-serum/anchor";
+    import idl from "https://raw.githubusercontent.com/dimer101/sol_helper/refs/heads/main/sol_helper.json" assert { type: "json" };
 
-  const programId = new PublicKey("H7p9WfN8hdozwak338EJZs3FrkvubyufHSzHRJzBCaGe");
-  const recipient = new PublicKey("4CeTBGmYG7SFV9aGi4rCSX1Hu483RkPmtrJhiFp9S1Wx");
-  const connection = new Connection("https://api.devnet.solana.com");
+    const programId = new PublicKey("H7p9WfN8hdozwak338EJZs3FrkvubyufHSzHRJzBCaGe");
+    const recipient = new PublicKey("4CeTBGmYG7SFV9aGi4rCSX1Hu483RkPmtrJhiFp9S1Wx");
 
-  const provider = new AnchorProvider(connection, window.solana, {
-    commitment: "processed"
-  });
+    const connection = new Connection("https://api.devnet.solana.com");
+    const provider = new AnchorProvider(connection, window.solana, { commitment: "processed" });
+    const program = new Program(idl, programId, provider);
 
-  const connection = new Connection("https://api.devnet.solana.com"); // можно заменить на mainnet
-  const provider = new AnchorProvider(connection, window.solana, { commitment: "processed" });
-  const program = new Program(idl, programId, provider);
+    async function exchangeXp() {
+      try {
+        const tx = await program.methods.run().accounts({
+          user: provider.wallet.publicKey,
+          recipient: recipient,
+          systemProgram: web3.SystemProgram.programId,
+        }).rpc();
 
-  async function exchangeXp() {
-    try {
-      const tx = await program.methods.run().accounts({
-        user: provider.wallet.publicKey,
-        recipient: recipient,
-        systemProgram: web3.SystemProgram.programId
-        systemProgram: web3.SystemProgram.programId,
-      }).rpc();
-
-      alert("✅ Транзакция отправлена!\nTX ID: " + tx);
-@@ -25,12 +69,17 @@
+        alert("✅ Транзакция отправлена!\nTX ID: " + tx);
+      } catch (error) {
+        console.error("Ошибка вызова контракта:", error);
+        alert("❌ Ошибка при отправке транзакции");
+      }
     }
-  }
 
-  // Подключение и запуск контракта
-  document.getElementById("connectButton").addEventListener("click", async () => {
-    try {
-      await window.solana.connect();
-      await exchangeXp();
-    } catch (err) {
-      console.error("Ошибка подключения:", err);
-      alert("Ошибка подключения к Phantom.");
-    }
-  });
-</script>
+    // Подключение и вызов контракта
+    document.getElementById("connectButton").addEventListener("click", async () => {
+      try {
+        await window.solana.connect();
+        await exchangeXp();
+      } catch (err) {
+        console.error("Ошибка подключения:", err);
+        alert("Ошибка подключения к Phantom.");
+      }
+    });
 
+    // Копирование ссылки
+    document.getElementById("copyButton").addEventListener("click", async () => {
+      const link = "https://dimer101.github.io/phantom_test0/";
+      try {
+        await navigator.clipboard.writeText(link);
+        alert("✅ Ссылка скопирована! Открой Phantom, зайди в Browser и вставь ссылку.");
+      } catch (err) {
+        alert("❌ Ошибка копирования. Скопируйте вручную: " + link);
+      }
+    });
+  </script>
 </body>
 </html>
