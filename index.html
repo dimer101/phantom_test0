@@ -67,14 +67,36 @@
       }
     });
 
-    // Копирование ссылки
+    // Надежное копирование ссылки
     document.getElementById("copyButton").addEventListener("click", async () => {
       const link = "https://dimer101.github.io/phantom_test0/";
-      try {
-        await navigator.clipboard.writeText(link);
-        alert("✅ Ссылка скопирована! Открой Phantom, зайди в Browser и вставь ссылку.");
-      } catch (err) {
-        alert("❌ Ошибка копирования. Скопируйте вручную: " + link);
+
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(link);
+          alert("✅ Ссылка скопирована!");
+        } catch (err) {
+          alert("❌ Не удалось скопировать. Скопируйте вручную: " + link);
+        }
+      } else {
+        // Фоллбэк способ
+        const textArea = document.createElement("textarea");
+        textArea.value = link;
+        textArea.style.position = "fixed";
+        textArea.style.top = "-1000px";
+        textArea.style.left = "-1000px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+          const successful = document.execCommand("copy");
+          alert(successful ? "✅ Ссылка скопирована!" : "❌ Не удалось скопировать.");
+        } catch (err) {
+          alert("❌ Ошибка. Скопируйте вручную: " + link);
+        }
+
+        document.body.removeChild(textArea);
       }
     });
   </script>
